@@ -1,0 +1,17 @@
+[
+    {
+      "name": "Player 1",
+      "country": "USA",
+      "isSelected": false
+    },
+    {
+      "name": "Player 2",
+      "country": "Canada",
+      "isSelected": false
+    },
+    {
+      "name": "Player 3",
+      "country": "Mexico",
+      "isSelected": false
+    }
+  ]

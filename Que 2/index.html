@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Players</title>
+  <style>
+    table {
+      border-collapse: collapse;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: left;
+    }
+    .selected {
+      background-color: #c6efce;
+    }
+  </style>
+</head>
+<body>
+  <h1>Players</h1>
+  <table id="players-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Country</th>
+      </tr>
+    </thead>
+    <tbody id="players-tbody">
+    </tbody>
+  </table>
+  <p id="selected-players-count">No players selected</p>
+
+  <script src="script.js"></script>
+</body>
+</html>
