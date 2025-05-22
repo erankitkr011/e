@@ -1,39 +1,69 @@
-const express = require('express');
-const path = require('path');
-const fs = require('fs');
-const { MongoClient } = require('mongodb');
+const express = require("express");
+const mongoose = require("mongoose");
 
-const app = express();
-let db;
+// MongoDB connection string
+// const DATABASE_URL = "mongodb+srv://shubham:27378283@shubhamcluster.3rxre.mongodb.net/C";
+// const DATABASE_URL =
+//   "mongodb+srv://shubham:27378283@shubhamcluster.3rxre.mongodb.net/D";
 
-MongoClient.connect('mongodb+srv://ankitkr23042004:XSF0srtElLSB0iXV@cluster0.ryory2y.mongodb.net/')
-    .then(client => {
-        db = client.db('dbName');
-        db.collection('collectionName').insertOne({ "name": "question" })
-            .then(d => console.log('Document inserted'))
-            .catch(err => console.error('Error inserting document:', err));
+// Connect to MongoDB
+mongoose
+  .connect(DATABASE_URL)
+  .then(() => console.log("DB connection successful"))
+  .catch((err) => console.log("DB connection error:", err));
 
-        db.collection('collectionName').find().toArray()
-            .then(d => console.log(d))
-            .catch(err => console.error('Error fetching documents:', err));
-    })
-    .catch(err => console.error('Error connecting to MongoDB:', err));
-
-app.use(express.static('.'));
-
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, "index.html"));
+// Define schema and model
+const questionSchema = new mongoose.Schema({
+  text: {
+    type: String,
+    required: true,
+  },
+  response: {
+    type: String,
+    default: null,
+  },
 });
 
-app.get('/GetProducts', (req, res) => {
-    const category = req.query.category;
-    const filePath = path.join(__dirname, "products.json");
-    const data = fs.readFileSync(filePath, 'utf-8');
-    const products = JSON.parse(data);
-    const filteredProducts = products.filter(product => product.product_category === category);
-    res.json(filteredProducts);
+const Question = mongoose.model("Question", questionSchema);
+
+// Initialize Express app
+const app = express();
+app.use(express.json()); // Middleware to parse JSON
+
+// POST route to save a question
+app.post("/", async (req, res) => {
+  const { text, response } = req.body;
+
+  if (!text) {
+    return res.status(400).json({ error: "Question text is required" });
+  }
+
+  try {
+    const newQuestion = new Question({ text, response });
+    await newQuestion.save();
+    res
+      .status(201)
+      .json({ message: "Question saved successfully", question: newQuestion });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "Failed to save question", details: error.message });
+  }
+});
+
+// GET route to fetch all questions
+app.get("/", async (req, res) => {
+  try {
+    const questions = await Question.find();
+    console.log(questions);
+    res.status(200).json(questions);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "Failed to fetch questions", details: error.message });
+  }
 });
 
 app.listen(3000, () => {
-    console.log("Server is started on port 3000");
+  console.log("Server is running on port 3000");
 });
